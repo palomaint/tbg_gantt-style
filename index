@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TBG Company Analysis Workflow</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: auto;
+        }
+        
+        .header {
+            background: #ffffff;
+            padding: 24px 40px;
+            border-bottom: 1px solid #d2d2d7;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+        
+        .header-left p {
+            font-size: 14px;
+            color: #86868b;
+            font-weight: 400;
+        }
+        
+        .header-links {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .header-btn {
+            padding: 10px 20px;
+            background: #0071e3;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+        
+        .header-btn:hover {
+            background: #0077ed;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+        }
+        
+        .header-btn.secondary {
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+        
+        .header-btn.secondary:hover {
+            background: #e8e8ed;
+        }
+        
+        .container {
+            padding: 40px;
+            max-width: 2000px;
+            margin: 0 auto;
+        }
+        
+        .timeline {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 40px;
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .phase {
+            flex: 1;
+            padding: 16px;
+            background: #f5f5f7;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .phase:hover {
+            background: #e8e8ed;
+            transform: translateY(-2px);
+        }
+        
+        .phase-number {
+            width: 32px;
+            height: 32px;
+            background: #0071e3;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto 12px;
+            font-size: 14px;
+        }
+        
+        .phase-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+        }
+        
+        .phase-subtitle {
+            font-size: 11px;
+            color: #86868b;
+        }
+        
+        .phase-arrow {
+            position: absolute;
+            right: -16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0071e3;
+            font-size: 24px;
+            font-weight: 300;
+        }
+        
+        .phase:last-child .phase-arrow {
+            display: none;
+        }
+        
+        .swimlanes {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            overflow-x: auto;
+        }
+        
+        .swimlane {
+            display: flex;
+            border-bottom: 1px solid #f5f5f7;
+            min-height: 80px;
+            transition: background 0.2s ease;
+        }
+        
+        .swimlane:hover {
+            background: #fafafa;
+        }
+        
+        .swimlane:last-child {
+            border-bottom: none;
+        }
+        
+        .swimlane-header {
+            width: 180px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-right: 2px solid #f5f5f7;
+            flex-shrink: 0;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0071e3, #00a1e3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .avatar.fc {
+            background: linear-gradient(135deg, #ff3b30, #ff6b58);
+        }
+        
+        .avatar.secondary {
+            background: linear-gradient(135deg, #34c759, #66d483);
+        }
+        
+        .name-role {
+            flex: 1;
+        }
+        
+        .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 2px;
+        }
+        
+        .role {
+            font-size: 11px;
+            color: #86868b;
+        }
+        
+        .swimlane-content {
+            flex: 1;
+            display: flex;
+            padding: 12px 0;
+            gap: 8px;
+            min-width: 1200px;
+        }
+        
+        .lane-cell {
+            flex: 1;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .task-card {
+            background: #f5f5f7;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #1d1d1f;
+            font-weight: 500;
+            width: 100%;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .task-card:hover {
+            transform: scale(1.02);
+            border-color: #0071e3;
+            box-shadow: 0 2px 8px rgba(0,113,227,0.15);
+        }
+        
+        .task-card.active {
+            background: #0071e3;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .task-card.fc-heavy {
+            background: #ff3b30;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .task-card.fc-heavy::after {
+            content: '⚠️';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 16px;
+        }
+        
+        .task-card.review {
+            background: #af52de;
+            color: white;
+        }
+        
+        .task-card.waiting {
+            background: transparent;
+            border: 2px dashed #d2d2d7;
+            color: #86868b;
+            font-style: italic;
+        }
+        
+        .task-duration {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 24px;
+            background: #ffffff;
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-top: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .legend-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+        }
+        
+        .quick-ref {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            margin-top: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .quick-ref h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1d1d1f;
+        }
+        
+        .ref-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .ref-card {
+            background: #f5f5f7;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .ref-card h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+        
+        .ref-card ul {
+            list-style: none;
+            font-size: 12px;
+            color: #1d1d1f;
+            line-height: 1.8;
+        }
+        
+        .ref-card ul li {
+            padding-left: 16px;
+            position: relative;
+        }
+        
+        .ref-card ul li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #0071e3;
+        }
+        
+        .comm-badge {
+            display: inline-block;
+            background: #34c759;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .alert-box {
+            background: #fff3cd;
+            border-left: 4px solid #ff9500;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .alert-box strong {
+            color: #1d1d1f;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 1200px) {
+            .timeline {
+                overflow-x: auto;
+            }
+            
+            .phase {
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>TBG Company Analysis Workflow</h1>
+                <p>Visual process flow • 9 phases • 10 weeks realistic target • Clear swim lanes</p>
+            </div>
+            <div class="header-links">
+                <a href="https://trello.com/b/0Q804lss/truth-below-ground" target="_blank" class="header-btn">📋 Open Trello Board</a>
+                <a href="https://iganingenieriaconsultores-my.sharepoint.com/:f:/g/personal/ignacio_velez_igan-consultores_com/EscR6odx3V1IlLc6KtJbIisBOMBRVyEYUjk3c3vBjGaeEQ?e=5%3avdWjrY&at=9" target="_blank" class="header-btn secondary">📁 Open IGAN Folder</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Alert Box -->
+        <div class="alert-box">
+            <strong>⚠️ Francisco Workload Alert</strong>
+            Red cards show FC's critical bottleneck tasks. These cannot run in parallel - they are sequential dependencies that must be carefully managed.
+        </div>
+        
+        <!-- Phase Timeline -->
+        <div class="timeline">
+            <div class="phase">
+                <div class="phase-number">1</div>
+                <div class="phase-title">Selection</div>
+                <div class="phase-subtitle">Community Vote</div>
+                <div class="phase-arrow">→</div>
+            </div>
+            <div class="phase">
+                <div class="phase-number">2</div>
+                <div class="phase-title">Setup</div>
+                <div class="phase-subtitle">Week 1</div>
+                <div class="phase-arrow">→</div>
+            </div>
+            <div class="phase">
+                <div class="phase-number">3</div>
+                <div class="phase-title">Technical Analysis</div>
+                <div class="phase-subtitle">Weeks 2-4</div>
+                <div class="phase-arrow">→</div>
+            </div>
+            <div class="phase">
+                <div class="phase-number">4</div>
+                <div class="phase-title">Risk Matrix</div>
+                <div class="phase-subtitle">Week 5</div>
+                <div class="phase-arrow">→</div>
+            </div>
+            <div class="phase">
+                <div class="phase-number">5</div>
+                <div class="phase-title">Integration</div>
+                <div class="phase-subtitle">Week 6</div>
+                <div class="phase-arrow">→</div>
+            </div>
+            <div class="phase">
+                <div class="phase-number">6</div>
+                <div class="phase-title">Spanish Review</div>
+                <div class="phase-subtitle">Weeks 7-8</div>
+                <div class="phase-arrow">→</div>
+            </div>
+            <div class="phase">
+                <div class="phase-number">7</div>
+                <div class="phase-title">Translation</div>
+                <div class="phase-subtitle">Weeks 9-10</div>
+                <div class="phase-arrow">→</div>
+            </div>
+            <div class="phase">
+                <div class="phase-number">8</div>
+                <div class="phase-title">Publication</div>
+                <div class="phase-subtitle">Week 10</div>
+                <div class="phase-arrow">→</div>
+            </div>
+            <div class="phase">
+                <div class="phase-number">9</div>
+                <div class="phase-title">Monitoring</div>
+                <div class="phase-subtitle">Ongoing</div>
+            </div>
+        </div>
+        
+        <!-- Swim Lanes -->
+        <div class="swimlanes">
+            <!-- Francisco -->
+            <div class="swimlane">
+                <div class="swimlane-header">
+                    <div class="avatar fc">FC</div>
+                    <div class="name-role">
+                        <div class="name">Francisco</div>
+                        <div class="role">Finance & Integration</div>
+                    </div>
+                </div>
+                <div class="swimlane-content">
+                    <div class="lane-cell">
+                        <div class="task-card waiting">—</div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Gather Basic Company Data<br><span class="task-duration">2 days</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card fc-heavy">Finance Section<br>Market Study<br>Excel Model<br>Valuation Chapter<br><span class="task-duration">3 weeks SEQUENTIAL</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card fc-heavy">Review & Integrate Risk Matrix<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card fc-heavy">Integrate Report<br>Conclusions<br>Exec Summary<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card fc-heavy">Incorporate Feedback (SA→AB→AM)<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card fc-heavy">Format AI Translation + Visuals<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card waiting">Handoff to IP</div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card waiting">—</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mónica (Geology) -->
+            <div class="swimlane">
+                <div class="swimlane-header">
+                    <div class="avatar">MB</div>
+                    <div class="name-role">
+                        <div class="name">Mónica</div>
+                        <div class="role">Geology</div>
+                    </div>
+                </div>
+                <div class="swimlane-content">
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card">Upload Geology Data<span class="comm-badge">💬 Equipo Técnico</span><br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Geology Section (ES)<br><span class="task-duration">3 weeks</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Fill Risk Matrix (Geology)<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                </div>
+            </div>
+            
+            <!-- Ignacio (Mining) -->
+            <div class="swimlane">
+                <div class="swimlane-header">
+                    <div class="avatar">IV</div>
+                    <div class="name-role">
+                        <div class="name">Ignacio</div>
+                        <div class="role">Mining</div>
+                    </div>
+                </div>
+                <div class="swimlane-content">
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card">Upload Mining Data<span class="comm-badge">💬 Equipo Técnico</span><br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Mining Section (ES)<br><span class="task-duration">3 weeks</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Fill Risk Matrix (Mining)<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card review">Review English (Technical)<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                </div>
+            </div>
+            
+            <!-- Sergio (Process/Infrastructure) -->
+            <div class="swimlane">
+                <div class="swimlane-header">
+                    <div class="avatar">SA</div>
+                    <div class="name-role">
+                        <div class="name">Sergio</div>
+                        <div class="role">Process & Infra</div>
+                    </div>
+                </div>
+                <div class="swimlane-content">
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card">Upload Process Data<span class="comm-badge">💬 Equipo Técnico</span><br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Process/Infra/Execution (ES)<br><span class="task-duration">3 weeks</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Fill Risk Matrix (Process)<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card review">Review Excel + Report<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                </div>
+            </div>
+            
+            <!-- Iñaki (Risk & ESG) -->
+            <div class="swimlane">
+                <div class="swimlane-header">
+                    <div class="avatar">IL</div>
+                    <div class="name-role">
+                        <div class="name">Iñaki</div>
+                        <div class="role">Risk & ESG</div>
+                    </div>
+                </div>
+                <div class="swimlane-content">
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card">Upload Risk Data<span class="comm-badge">💬 Equipo Técnico</span><br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Risk & ESG Section (ES)<br><span class="task-duration">3 weeks</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Fill & Review ALL Risk Matrix<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                </div>
+            </div>
+            
+            <!-- Paloma (Management) -->
+            <div class="swimlane">
+                <div class="swimlane-header">
+                    <div class="avatar">PO</div>
+                    <div class="name-role">
+                        <div class="name">Paloma</div>
+                        <div class="role">Management</div>
+                    </div>
+                </div>
+                <div class="swimlane-content">
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card">Upload Mgmt Data<span class="comm-badge">💬 Equipo Técnico</span><br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Management Section (ES)<br><span class="task-duration">3 weeks</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Fill Risk Matrix (Management)<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Run AI Translation<br>Review English (1st)<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                </div>
+            </div>
+            
+            <!-- Amadeu (Coordinator) -->
+            <div class="swimlane">
+                <div class="swimlane-header">
+                    <div class="avatar secondary">AB</div>
+                    <div class="name-role">
+                        <div class="name">Amadeu</div>
+                        <div class="role">Coordinator</div>
+                    </div>
+                </div>
+                <div class="swimlane-content">
+                    <div class="lane-cell">
+                        <div class="task-card">Notify Commercial Team</div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card review">Review Report<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card">Approve Final<br>Notify Commercial</div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                </div>
+            </div>
+            
+            <!-- Ángel (Marketing) -->
+            <div class="swimlane">
+                <div class="swimlane-header">
+                    <div class="avatar secondary">AM</div>
+                    <div class="name-role">
+                        <div class="name">Ángel</div>
+                        <div class="role">Marketing</div>
+                    </div>
+                </div>
+                <div class="swimlane-content">
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card">Support Market Study Research<br><span class="task-duration">Ongoing</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card review">Final Marketing Review<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Launch Campaign<br><span class="task-duration">Ongoing</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Monitor Alerts</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Iñigo (Website) -->
+            <div class="swimlane">
+                <div class="swimlane-header">
+                    <div class="avatar secondary">IP</div>
+                    <div class="name-role">
+                        <div class="name">Iñigo</div>
+                        <div class="role">Website & Tech</div>
+                    </div>
+                </div>
+                <div class="swimlane-content">
+                    <div class="lane-cell">
+                        <div class="task-card active">Announce Company Selected<span class="comm-badge">💬 WhatsApp</span></div>
+                    </div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">—</div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Publish to Website<br><span class="task-duration">1 week</span></div>
+                    </div>
+                    <div class="lane-cell">
+                        <div class="task-card active">Setup Alerts<br>Monitor Forum</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background: #0071e3;"></div>
+                <span>Active Work</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #ff3b30;"></div>
+                <span>FC Critical Path ⚠️</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #af52de;"></div>
+                <span>Review Stage</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #f5f5f7; border: 2px dashed #d2d2d7;"></div>
+                <span>Waiting / Idle</span>
+            </div>
+        </div>
+        
+        <!-- Quick Reference -->
+        <div class="quick-ref">
+            <h3>Quick Reference Guide</h3>
+            <div class="ref-grid">
+                <div class="ref-card">
+                    <h4>📁 File Locations</h4>
+                    <ul>
+                        <li><strong>/01_Source_Data/</strong> Public info, references</li>
+                        <li><strong>/02_Working/[INITIALS]/</strong> Individual drafts</li>
+                        <li><strong>/03_Final/</strong> MASTER & FINAL versions only</li>
+                        <li><strong>/04_Excel/</strong> Valuation models</li>
+                    </ul>
+                </div>
+                
+                <div class="ref-card">
+                    <h4>📝 File Naming</h4>
+                    <ul>
+                        <li>Draft: Company_Section_v1_MB_150125.docx</li>
+                        <li>Master: Company_MASTER_v3_200125.docx</li>
+                        <li>Final ES: Company_FINAL_ES_050226.docx</li>
+                        <li>Final EN: Company_FINAL_EN_120226.docx</li>
+                    </ul>
+                </div>
+                
+                <div class="ref-card">
+                    <h4>🔔 Handoff Notifications</h4>
+                    <ul>
+                        <li>IP → Team: WhatsApp announcement of company</li>
+                        <li>SME → SMEs: Cross-discipline info via "Equipo Técnico" WhatsApp</li>
+                        <li>SME → FC: Upload to IGAN folder when section done</li>
+                        <li>IL → FC: Risk Matrix consolidated</li>
+                        <li>FC → Reviewers: WhatsApp notification</li>
+                        <li>Reviewers → FC: Comments in Word doc</li>
+                        <li>FC → AB: WhatsApp when Spanish FINAL ready</li>
+                        <li>PO runs AI translation → FC formats → PO reviews → IV reviews</li>
+                        <li>FC → AB: WhatsApp when English FINAL ready</li>
+                        <li>AB → Commercial: Team announcement</li>
+                    </ul>
+                </div>
+                
+                <div class="ref-card">
+                    <h4>⚠️ FC Bottleneck Tasks (SEQUENTIAL)</h4>
+                    <ul>
+                        <li>Finance Section (Week 4)</li>
+                        <li>Market Study (Week 4-5)</li>
+                        <li>Excel Valuation Model (Week 5)</li>
+                        <li>Valuation Chapter (Week 5)</li>
+                        <li>Risk Matrix Integration (Week 5)</li>
+                        <li>Report Integration (Week 6)</li>
+                        <li>Executive Summary (Week 6)</li>
+                        <li>Conclusions (Week 6)</li>
+                        <li>3 rounds feedback incorporation (Weeks 7-8)</li>
+                        <li>Format AI translation + visuals (Weeks 9-10)</li>
+                    </ul>
+                </div>
+                
+                <div class="ref-card">
+                    <h4>✅ Critical Rules</h4>
+                    <ul>
+                        <li>NO offline copies - always use IGAN shared drive</li>
+                        <li>Translation via AI AFTER Spanish 100% final</li>
+                        <li>Reviews are SEQUENTIAL: SA → AB → AM (min 1 week each)</li>
+                        <li>SMEs upload their own discipline data</li>
+                        <li>Cross-discipline info shared via "Equipo Técnico" WhatsApp</li>
+                        <li>ALL SMEs fill Risk Matrix → IL reviews → FC integrates</li>
+                        <li>Only files with "FINAL" get published</li>
+                    </ul>
+                </div>
+                
+                <div class="ref-card">
+                    <h4>🎯 Success Factors</h4>
+                    <ul>
+                        <li>SMEs work truly in parallel (Weeks 2-4)</li>
+                        <li>Each SME uploads own discipline data to IGAN</li>
+                        <li>Risk Matrix filled by ALL SMEs in Week 5</li>
+                        <li>FC has protected time (no other projects)</li>
+                        <li>Reviews: minimum 1 week each (SA → AB → AM)</li>
+                        <li>Translation: PO runs AI → FC formats → PO/IV review</li>
+                        <li>Stick to 50-70 page target</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
